@@ -11,7 +11,7 @@ class MyHome extends StatefulWidget {
 class _MyHomePageState extends State<MyHome> {
   TextStyle _styleToolbar=TextStyle(fontSize: 18,color: Colors.grey);
   int _current_index=1;
-
+////
   List _images=['asset/images/main_slider_1.png',
     'asset/images/main_slider_3.jpeg',
     'asset/images/main_slider_4.jpg'];
