@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -110,8 +108,22 @@ class _MyHomePageState extends State<MyHome> {
           ],
         ),
         drawer: Drawer(
-          child: Column(
-            children: [],
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: Colors.blue.shade300,
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: FlatButton(child: Text('Create new request',style: TextStyle(color: Colors.white,fontSize: 18),),
+                  onPressed: (){},),
+                )
+              ],
+            ),
           ),
         ),
       ),
