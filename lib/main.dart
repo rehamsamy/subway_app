@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:subway_app/login.dart';
 import 'package:subway_app/register.dart';
+import 'package:subway_app/sender_receiver.dart';
 import 'package:subway_app/services_api/services_api.dart';
 
 import 'home.dart';
 
 void main() async{
 
-  runApp(MyHome());
+  runApp(SenderReceiver());
 }
 
 class MyApp extends StatelessWidget {

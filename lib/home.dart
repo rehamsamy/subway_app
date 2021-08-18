@@ -30,7 +30,7 @@ class _MyHomePageState extends State<MyHome> {
         body: Column(
           children: [
             Flexible(
-              flex: 1,
+              flex: 2,
               child: CarouselSlider(items: _images.map((e) => Container(
                      margin: EdgeInsets.symmetric(horizontal: 8),
                        width:double.infinity,child: Image.asset(e,fit: BoxFit.fill,))).toList()
@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHome> {
             Flexible(flex: 1,child: Stack(
                   children: [
                    Container(
-                     margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                     margin: EdgeInsets.fromLTRB(0, 80, 0, 0),
                      child: Center(
                          child: Image.asset('asset/images/home_photo.png')),
                    ),
@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHome> {
                                   color: Colors.blue.shade300,
                                 ),
                                 title: Text(
-                                  'Source',
+                                  'Sender',
                                   style: Constraints.styleGrayText,
                                   textAlign: TextAlign.start,
                                 ),
@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHome> {
                                   color: Colors.blue.shade300,
                                 ),
                                 title: Text(
-                                  'Destination',
+                                  'Receiver',
                                   style: Constraints.styleGrayText,
                                   textAlign: TextAlign.start,
                                 ),
@@ -114,7 +114,10 @@ class _MyHomePageState extends State<MyHome> {
               children: [
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(5),
+
+
+
                   decoration: BoxDecoration(
                       color: Colors.blue.shade300,
                     borderRadius: BorderRadius.circular(10)
