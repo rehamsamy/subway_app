@@ -29,19 +29,28 @@ class Constraints extends StatelessWidget {
 
 
  static void getProgress(BuildContext context){
-    var alert=AlertDialog(
-      content: Container(
-        height: 70,
-        child: Column(
-          children: [
-            CircularProgressIndicator(color: Colors.blue.shade300,),
-            SizedBox(height: 10,),
-            Text('loading')
-          ],
-        ),
-      ),
-    );
-    showDialog(context: context, builder: (_)=>alert);
+    // var alert=AlertDialog(
+    //   content: Container(
+    //     height: 70,
+    //     child: Column(
+    //       children: [
+    //         CircularProgressIndicator(color: Colors.blue.shade300,),
+    //         SizedBox(height: 10,),
+    //         Text('loading')
+    //       ],
+    //     ),
+    //   ),
+    // );
+    // showDialog(context: context, builder: (_)=>alert);
+
+
+   showDialog(
+       context: context,
+       builder: (BuildContext ctx) {
+         return Center(
+           child: CircularProgressIndicator(),
+         );
+       });
 
     // return Visibility(child: CircularProgressIndicator(color: Colors.blue.shade300,),visible: true,);
   }

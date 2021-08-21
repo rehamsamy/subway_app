@@ -6,10 +6,11 @@ import 'package:subway_app/sender_receiver.dart';
 import 'package:subway_app/services_api/services_api.dart';
 
 import 'home.dart';
+import 'models/dest_model.dart';
 
 void main() async{
 
-  runApp(SenderReceiver());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:subway_app/constraints.dart';
+import 'package:subway_app/sender_receiver.dart';
 
 class MyHome extends StatefulWidget {
   @override
@@ -29,8 +30,8 @@ class _MyHomePageState extends State<MyHome> {
 
         body: Column(
           children: [
-            Flexible(
-              flex: 2,
+            Expanded(
+              flex: 1,
               child: CarouselSlider(items: _images.map((e) => Container(
                      margin: EdgeInsets.symmetric(horizontal: 8),
                        width:double.infinity,child: Image.asset(e,fit: BoxFit.fill,))).toList()
@@ -54,10 +55,10 @@ class _MyHomePageState extends State<MyHome> {
                 ],
 
             ),
-            Flexible(flex: 1,child: Stack(
+            Expanded(flex: 1,child: Stack(
                   children: [
                    Container(
-                     margin: EdgeInsets.fromLTRB(0, 80, 0, 0),
+                     margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                      child: Center(
                          child: Image.asset('asset/images/home_photo.png')),
                    ),
@@ -75,11 +76,13 @@ class _MyHomePageState extends State<MyHome> {
                                   color: Colors.blue.shade300,
                                 ),
                                 title: Text(
-                                  'Sender',
+                                  'Internal',
                                   style: Constraints.styleGrayText,
                                   textAlign: TextAlign.start,
                                 ),
-                            onTap: (){},),
+                            onTap: (){
+                                  Navigator.push(context, MaterialPageRoute(builder: (_)=>SenderReceiver()));
+                            },),
                           ),
                         ),
                         Card(
@@ -94,11 +97,13 @@ class _MyHomePageState extends State<MyHome> {
                                   color: Colors.blue.shade300,
                                 ),
                                 title: Text(
-                                  'Receiver',
+                                  'External',
                                   style: Constraints.styleGrayText,
                                   textAlign: TextAlign.start,
                                 ),
-                            onTap: (){},),
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (_)=>SenderReceiver()));
+                            },),
                           ),
                         ),
                       ],
