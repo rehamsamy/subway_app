@@ -3,20 +3,13 @@ import 'package:subway_app/models/request.dart';
 import 'package:toast/toast.dart';
 
 
-class RequestItemCard extends StatefulWidget {
+class RequestItemCard extends StatelessWidget {
   RequestModel requestModel;
   RequestItemCard(this.requestModel);
 
   @override
-  _RequestItemCardState createState() => _RequestItemCardState();
-}
-
-class _RequestItemCardState extends State<RequestItemCard> {
-
-  String image='asset/images/wishlist_not_select.png';
-
-  @override
   Widget build(BuildContext context) {
+    String image='asset/images/wishlist_not_select.png';
     return   Card(
       margin: EdgeInsets.all(10),
       child: Container(
@@ -26,11 +19,11 @@ class _RequestItemCardState extends State<RequestItemCard> {
             Positioned(
                 right: 5,
                 bottom: 10,
-                child: Text(widget.requestModel.price.toString(),style: TextStyle(color: Colors.green),)),
+                child: Text(requestModel.price.toString(),style: TextStyle(color: Colors.green),)),
             Positioned(left: 0,
                 top: 0,
                 child: IconButton(icon: Image.asset(image),onPressed: (){
-                  setState(() {
+                  // setState(() {
                     if(image=='asset/images/wishlist_not_select.png'){
                       image='asset/images/wishlist_select.png';
                       Toast.show('add to favorite', context,duration:Toast.LENGTH_LONG);
@@ -38,12 +31,13 @@ class _RequestItemCardState extends State<RequestItemCard> {
                       image='asset/images/wishlist_not_select.png';
                       Toast.show('remove from favorite', context,duration:Toast.LENGTH_LONG);
                     }
-                  });
+                    Navigator.pop(context);
+                  // });
                 },)
             ),
             Positioned(
                 left: 5,
-                bottom: 10,child: Text(widget.requestModel.description,style: TextStyle(color: Colors.black),))
+                bottom: 10,child: Text(requestModel.description,style: TextStyle(color: Colors.black),))
           ],
         ) ,
       ),

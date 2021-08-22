@@ -6,11 +6,9 @@ import 'package:subway_app/models/dest_model.dart';
 import 'package:subway_app/request_item_card.dart';
 import 'package:subway_app/services_api/services_api.dart';
 import 'package:toast/toast.dart';
-
 import 'models/request.dart';
 
 class SenderReceiver extends StatelessWidget {
-
 
   @override
   Widget build(BuildContext context) {
@@ -48,29 +46,20 @@ class _SenderReceiverState extends State<SenderReceiver1> {
 
 
   var x = ['1', '2', '3', '4'];
-  @override
-  void initState() {
-    super.initState();
-    if(_isLoaded==true){
-      fetchDest();
-
-    }else{
-
-    }
-
-   print(_destList.length);
-  }
 
   @override
   Widget build(BuildContext context) {
 
-    fetchDest();
-    print('nnnnn  ${_destList.length}');
+    //fetchDest();
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.grey.shade200,
+          elevation: 20,
+          actions: [
+            IconButton(onPressed: (){}, icon: Icon(Icons.home,color: Colors.blue.shade300,))
+          ],
           bottom: TabBar(
             indicatorColor: Colors.blue.shade300,
             labelColor: Colors.blue.shade300,
@@ -88,6 +77,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
             Center(child: Text('data')),
           ],
         ),
+        drawer: Drawer(),
       ),
 
     );
@@ -95,11 +85,13 @@ class _SenderReceiverState extends State<SenderReceiver1> {
 
   Widget buildSenderTab() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(height: 20,),
         Expanded(
           flex: 1,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -108,7 +100,9 @@ class _SenderReceiverState extends State<SenderReceiver1> {
                     padding: const EdgeInsets.fromLTRB(0,0,10,0),
                     child: Text('FROM :'),
                   ),
+                  SizedBox(width: 10,),
                   buildDropDownListFromTo(dropdownValueFrom),
+                  SizedBox(width: 10,),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0,0,10,0),
                     child: Text('TO :'),
@@ -138,10 +132,6 @@ class _SenderReceiverState extends State<SenderReceiver1> {
                        if(_formattedDate==null){
                          Toast.show('must enter date', context,duration: Toast.LENGTH_LONG);
                        }else{
-                         //fetchFromToDestPlaceSerial();
-                         Constraints.getProgress(context);
-                         await  fetchRequests(_formattedDate,fromDestSerial,toDestSerial);
-                         Navigator.pop(context);
                          setState(() {
                            flag=1;
                          });
@@ -154,9 +144,18 @@ class _SenderReceiverState extends State<SenderReceiver1> {
             ],
           ),
         ),
-      
-   Expanded(flex:2,child: flag==0?Center(child:Text('Empty')):
-   getAllRequestsList(context))
+
+   Expanded(flex:2,child: flag==0?Center(child:Text('choose from , to dest and date to get all requests!!')):
+    getAllRequestsList(context)
+    // GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+    //     maxCrossAxisExtent: 100,
+    //     childAspectRatio: 1.5,
+    //     crossAxisSpacing: 20,
+    //     mainAxisSpacing: 20
+    // ),
+    //   children: _requestsList.map((e) => RequestItemCard(RequestModel('hhh','hh','hh','l'))).toList(),),
+    //
+   )
       ],
     );
   }
@@ -218,103 +217,98 @@ class _SenderReceiverState extends State<SenderReceiver1> {
   }
 
 
-
-  void fetchDest() async{
-  _destList=  await ServicesApi.fetchDest();
-  print(_destList.length);
-  }
-
   Widget buildDropDownListFromTo(String dropValue){
-
-   return Container(
-        width: 100,
-        child: _destList.length==0?
-        SizedBox(height:20,width: 20,child: CircularProgressIndicator(color: Colors.blue.shade300)):
-        DropdownButton(
-          value: _destList[0],
-          icon: Icon(Icons.arrow_drop_down),
-          iconSize: 24,
-          elevation: 16,
-          style: TextStyle(color: Colors.red, fontSize: 18),
-          underline: Container(
-            height: 2,
-           // color: Colors.deepPurpleAccent,
-          ),
-          onChanged: (val){
-            setState(() {
-              dropValue=val.name;
-              print(val);
-              DestModel model=_destList.firstWhere((element) => val.name==element.name);
-              fromDestSerial=model.dest_serial;
-              toDestSerial=model.dest_serial;
-              print('drop 1 : ${model}');
-            });
-          },
-          items: _destList.map<DropdownMenuItem<DestModel>>((DestModel value) {
-            return DropdownMenuItem<DestModel>(
-              value: value,
-              child: Text(value.name),
-            );
-          }).toList(),
-        )
+    return FutureBuilder(
+        future: ServicesApi.fetchDest(),
+        builder: (ctx, snapshot){
+          print('x1');
+         // _destList=ServicesApi.fetchDest();
+          if (snapshot.connectionState == ConnectionState.done) {
+            print('x2');
+            _destList=snapshot.data;
+            return
+                  DropdownButton(
+                    value: snapshot.hasData?_destList[0]:null,
+                    icon: Icon(Icons.arrow_drop_down),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: Colors.red, fontSize: 18),
+                    underline: Container(
+                      height: 2,
+                     // color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (val){
+                     setState(() {
+                        dropValue=val.name;
+                        //print(val);
+                        DestModel model=_destList.firstWhere((element) => val.name==element.name);
+                        fromDestSerial=model.dest_serial;
+                        toDestSerial=model.dest_serial;
+                       // print('drop 1 : ${model}');
+                     });
+                    },
+                    items: snapshot.data.map<DropdownMenuItem<DestModel>>((DestModel value) {
+                      return DropdownMenuItem<DestModel>(
+                        value: value,
+                        child: Text(value.name),
+                      );
+                    }).toList(),
+                  );
+          }
+          else {
+            print('x3');
+            //Toast.show('error', context,duration: Toast.LENGTH_LONG);
+            return Center(child: CircularProgressIndicator());
+          }
+        }
     );
   }
 
 
   Widget getAllRequestsList(BuildContext context) {
-
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
- //Constraints.getProgress(context);
-    if (_requestsList.length == 0) {
-     // return  CircularProgressIndicator(color: Colors.blue.shade300,);
-      print('p');
-    } else {
-      print('g');
-    }
-    return _requestsList.isEmpty ?
-    Center(child: Text('empty requests')) :
-    Container(
-      height: 300,
-      child: GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: width/2,
-        childAspectRatio: 1.5,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20
-      ),
-      children: _requestsList.map((e) => RequestItemCard(e)).toList(),),
-    );
-    Center(
-      child: Container(
-        height: 100,
-        child: ListView(
-          children: _requestsList.map((e) => Text(e.description)).toList(),
-        ),
-      ),
-    );
-
-
-  }
-
-  void fetchRequests(String date,from,to) async {
     Map<String, String> map = {
       'USER_NAME': '1',
-      'FROM_DESTINATION': from.toString(),
+      'FROM_DESTINATION': '1',
       'TO_DESTINATION': '2',
-      'SEND_DATE': date
+      'SEND_DATE': _formattedDate
     };
-    print('fffff ${ from.toString() }');
-    _requestsList = await ServicesApi.getAllRequests(map);
-    print(_requestsList.length);
+    return FutureBuilder(
+      future:ServicesApi.getAllRequests(map) ,
+      builder: (ctx,snapshot){
+       // Future.delayed(Duration(seconds: 1));
+      if( snapshot.connectionState==ConnectionState.done&& snapshot.hasData){
+        _requestsList=snapshot.data;
+        print('jjjjj ${fromDestSerial}');
+        return Container(
+           height:100 ,
+              child: GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                childAspectRatio: 1.5,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20
+              ),
+              children: _requestsList.map((e) => RequestItemCard(e)).toList(),),
+            );
+        }else if(snapshot.connectionState==ConnectionState.waiting){
+        Constraints.getProgress(ctx);
+       Navigator.pop(context);
+      }else if(_requestsList.isEmpty){
+        return Center(child: Text('no data'),);
+      }
+
+      },
+    );
+
+
   }
 
 
-int fetchFromToDestPlaceSerial(){
-   DestModel model= _destList.firstWhere((element) => element.name==dropdownValueTo);
-   print(model.dest_serial);
-   return model.dest_serial;
-
-}
-
-
+//   int fetchFromToDestPlaceSerial(){
+//    DestModel model= _destList.firstWhere((element) => element.name==dropdownValueTo);
+//    print(model.dest_serial);
+//    return model.dest_serial;
+//
+// }
 }

@@ -56,15 +56,13 @@ class ServicesApi {
     }
   }
 
-
- static Future<List<DestModel>> fetchDest() async {
+ static  Future<List<DestModel>> fetchDest() async {
     List<DestModel> _postList = new List<DestModel>();
 
     Map<String,String> map={
       'FROM':'',
       'LANG':'EN'
     };
-
     final response =
     await http.get(
         Uri.parse('https://sub-way.herokuapp.com/GETDESTINATION_API'),headers: map);
@@ -84,13 +82,14 @@ class ServicesApi {
       }
       return _postList;
     } else {
+      print('ccccccccccccc');
       // If that call was not successful, throw an error.
       throw Exception('Failed to load post');
     }
   }
 
 
-  static Future getAllRequests(Map<String,String> map)async{
+  static Future<List<RequestModel>> getAllRequests(Map<String,String> map)async{
     List<RequestModel> requests = new List<RequestModel>();
 
     final response =
