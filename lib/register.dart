@@ -186,6 +186,7 @@ class _RegisterState extends State<Register> {
      Constraints.getProgress(context);
      var result=await ServicesApi.registerUser(map);
      if(result.toString()=='User Created'){
+       Toast.show(result.toString(), context,duration: Toast.LENGTH_LONG);
        Navigator.push(context, MaterialPageRoute(builder: (_)=>MyHome()));
      }else{
        Toast.show(result.toString(), context,duration: Toast.LENGTH_LONG);

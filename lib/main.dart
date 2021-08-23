@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:subway_app/create_request.dart';
 import 'package:subway_app/login.dart';
 import 'package:subway_app/register.dart';
 import 'package:subway_app/sender_receiver.dart';
@@ -10,7 +11,7 @@ import 'models/dest_model.dart';
 
 void main() async{
 
-  runApp(SenderReceiver());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

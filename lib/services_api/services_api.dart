@@ -12,11 +12,11 @@ class ServicesApi {
   static Future loginApi(Map<String, String> map) async {
     var url = 'http://sub-way.herokuapp.com/LOGIN_API';
     print(map.toString());
-    final responce = await http.get(Uri.parse(url), headers: map);
+    final responce = await http.get(Uri.parse(url),headers: map);
+    print(responce.body);
     if (responce.statusCode == 200) {
-      var obj = json.decode(responce.body);
       print('sucess');
-      return obj;
+      return responce.body;
     } else {
       print(responce.body);
     }
@@ -25,11 +25,17 @@ class ServicesApi {
 
   static Future registerUser(Map<String, String> map) async {
     var url = 'http://sub-way.herokuapp.com/REGISTER_API';
+
+    print('sucess  ${json.encode(map)}');
     print(map.toString());
-    final responce = await http.post(Uri.parse(url), headers: map,);
+  var responce=  await http.post(Uri.parse(url), body: json.encode(map),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        encoding: Encoding.getByName('utf-8'));
+       print(responce.body);
     if (responce.statusCode == 200) {
-      print('sucess  ${jsonDecode(responce.body)}');
-      //var obj=json.decode(responce.body);
+      print('sucess  ${responce.body}');
       return responce.body;
     } else {
       print(responce.body);
@@ -41,16 +47,16 @@ class ServicesApi {
     var url = 'http://sub-way.herokuapp.com/CREATEREQUEST_API';
 
     final http.Response response = await http.post(
-      Uri.parse(url),headers: map,
-      // headers: <String, String>{
-      //   'Content-Type': 'application/json; charset=UTF-8',
-      // },
+      Uri.parse(url),
+        body: json.encode(map),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        encoding: Encoding.getByName('utf-8')
     );
-
-
     if (response.statusCode == 200) {
       print('sucess ${response.body}');
-      return jsonEncode(response.body);
+      return response.body;
     } else {
       throw Exception('Failed to create album.');
     }
@@ -93,22 +99,23 @@ class ServicesApi {
     List<RequestModel> requests = new List<RequestModel>();
 
     final response =
-        await http.get(
-        Uri.parse('https://sub-way.herokuapp.com/GETALLREQUESTES_API'),headers: map);
-print('ffffffffffff 1');
-    if(response.statusCode==200){
+    await http.get(
+        Uri.parse('https://sub-way.herokuapp.com/GETALLREQUESTES_API'),
+        headers: map);
+    print('ffffffffffff 1');
+    if (response.statusCode == 200) {
       print('ffffffffffff 2');
-      List<dynamic> values=json.decode(response.body);
-      if(values.length>0){
-        for(int i=0;i<values.length;i++){
+      List<dynamic> values = json.decode(response.body);
+      if (values.length > 0) {
+        for (int i = 0; i < values.length; i++) {
           print('Id-------${values[i]}');
           Map<String, dynamic> map = values[i];
           requests.add(RequestModel.fromJson(map));
           print('Id-------${map['description']}');
         }
       }
-          return requests;
-    }else{
+      return requests;
+    } else {
       print('ffffffffffff 3');
       throw Exception('Failed to load post');
     }

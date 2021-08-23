@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:subway_app/constraints.dart';
 import 'package:intl/intl.dart';
+import 'package:subway_app/create_request.dart';
 import 'package:subway_app/models/dest_model.dart';
 import 'package:subway_app/request_item_card.dart';
 import 'package:subway_app/services_api/services_api.dart';
@@ -78,6 +79,10 @@ class _SenderReceiverState extends State<SenderReceiver1> {
           ],
         ),
         drawer: Drawer(),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (_)=>CreateRequest())),
+        ),
       ),
 
     );
@@ -147,14 +152,6 @@ class _SenderReceiverState extends State<SenderReceiver1> {
 
    Expanded(flex:2,child: flag==0?Center(child:Text('choose from , to dest and date to get all requests!!')):
     getAllRequestsList(context)
-    // GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-    //     maxCrossAxisExtent: 100,
-    //     childAspectRatio: 1.5,
-    //     crossAxisSpacing: 20,
-    //     mainAxisSpacing: 20
-    // ),
-    //   children: _requestsList.map((e) => RequestItemCard(RequestModel('hhh','hh','hh','l'))).toList(),),
-    //
    )
       ],
     );
@@ -263,8 +260,6 @@ class _SenderReceiverState extends State<SenderReceiver1> {
         }
     );
   }
-
-
   Widget getAllRequestsList(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -300,15 +295,5 @@ class _SenderReceiverState extends State<SenderReceiver1> {
 
       },
     );
-
-
   }
-
-
-//   int fetchFromToDestPlaceSerial(){
-//    DestModel model= _destList.firstWhere((element) => element.name==dropdownValueTo);
-//    print(model.dest_serial);
-//    return model.dest_serial;
-//
-// }
 }

@@ -123,17 +123,21 @@ class _LoginState extends State<Login> {
     var email=_prefs.getString('email');
     var password=_prefs.getString('password');
 
-    print('email ... ${email} .... pass ....${password}');
-    Map<String,String> map={'USER_NAME':'MOATASEM1','PASSWORD':'123'};
+   // print('email ... ${c_email.text} .... pass ....${_passwordController.text}');
+
+    Map<String,String> map={'USER_NAME':c_email.text,'PASSWORD':_passwordController.text};
    Constraints.getProgress(context);
     var x=await ServicesApi.loginApi(map);
     print('fffffff ${x.toString()}');
-   if(x==0){
-     Toast.show('invalid Email or password', context,duration: Toast.LENGTH_LONG);
-   }else{
+  if(x=='Please Check user name and password'){
+     Toast.show(x, context,duration: Toast.LENGTH_LONG);
+     Future.delayed(Duration(seconds: 30));
+     Navigator.pop(context);
+
+  }else{
      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>MyHome()));
      await setDataInPreferences(c_email.text,c_password.text);
-   }
+  }
 
   }
 
