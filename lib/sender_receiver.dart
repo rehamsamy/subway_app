@@ -1,29 +1,40 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:subway_app/constraints.dart';
 import 'package:intl/intl.dart';
 import 'package:subway_app/create_request.dart';
 import 'package:subway_app/models/dest_model.dart';
 import 'package:subway_app/request_item_card.dart';
+import 'package:subway_app/services_api/my_provider.dart';
 import 'package:subway_app/services_api/services_api.dart';
 import 'package:toast/toast.dart';
 import 'models/request.dart';
 
+
 class SenderReceiver extends StatelessWidget {
+
 
   @override
   Widget build(BuildContext context) {
+    WidgetsFlutterBinding.ensureInitialized();
     return MaterialApp(
-      home: SenderReceiver1(),
+      home: ChangeNotifierProvider<MyProvide>(
+          create :(_)=>MyProvide(),
+          child: SenderReceiver1()),
     );
   }
 }
+
+
 
 
 class SenderReceiver1 extends StatefulWidget {
   @override
   _SenderReceiverState createState() => _SenderReceiverState();
 }
+
+
 
 class _SenderReceiverState extends State<SenderReceiver1> {
 
@@ -48,9 +59,24 @@ class _SenderReceiverState extends State<SenderReceiver1> {
 
   var x = ['1', '2', '3', '4'];
 
+
+  @override
+  void initState() {
+    super.initState();
+    Map<String, String> map = {
+      'USER_NAME': '1',
+      'FROM_DESTINATION': '1',
+      'TO_DESTINATION': '2',
+      'SEND_DATE': '2021-08-09'
+    };
+    Provider.of<MyProvide>(context,listen: false).getAllRequests(map);
+  }
+
   @override
   Widget build(BuildContext context) {
-
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    _requestsList= Provider.of<MyProvide>(context,listen: true).requests;
     //fetchDest();
     return DefaultTabController(
       length: 2,
@@ -89,6 +115,8 @@ class _SenderReceiverState extends State<SenderReceiver1> {
   }
 
   Widget buildSenderTab() {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -132,14 +160,13 @@ class _SenderReceiverState extends State<SenderReceiver1> {
                     color: Colors.blue.shade300
                 ),
                 child: Center(
-                  child: FlatButton(child: Text('Get Requests',style: _style1,),onPressed:()async{
-                        print('pressed');
+                  child: FlatButton(child: Text('Get Requests',style: _style1,),onPressed:(){
+                    //print(Provider.of<MyProvide>(context,listen: true).flag);
                        if(_formattedDate==null){
                          Toast.show('must enter date', context,duration: Toast.LENGTH_LONG);
                        }else{
-                         setState(() {
-                           flag=1;
-                         });
+                         Provider.of<MyProvide>(context,listen: false).getFlag(1);
+                         print('flag ${flag}');
                        }
                   }
 
@@ -149,9 +176,17 @@ class _SenderReceiverState extends State<SenderReceiver1> {
             ],
           ),
         ),
-
-   Expanded(flex:2,child: flag==0?Center(child:Text('choose from , to dest and date to get all requests!!')):
-    getAllRequestsList(context)
+   Expanded (
+       flex:2,child: Provider.of<MyProvide>(context,listen: true).flag==0?
+   Center(child:Text('choose from , to dest and date to get all requests!!')):
+   GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+       maxCrossAxisExtent: width/2,
+       childAspectRatio: 1.5,
+       crossAxisSpacing: 20,
+       mainAxisSpacing: 20
+   ),
+     children: _requestsList.map((e) => buildRequestItemCard(e,context)).toList(),
+   ),
    )
       ],
     );
@@ -213,7 +248,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
     }));
   }
 
-
+//............................. build drop down from to dest  ...............................
   Widget buildDropDownListFromTo(String dropValue){
     return FutureBuilder(
         future: ServicesApi.fetchDest(),
@@ -260,6 +295,8 @@ class _SenderReceiverState extends State<SenderReceiver1> {
         }
     );
   }
+
+  //..........   get all Request lis ........................................//
   Widget getAllRequestsList(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -267,27 +304,29 @@ class _SenderReceiverState extends State<SenderReceiver1> {
       'USER_NAME': '1',
       'FROM_DESTINATION': '1',
       'TO_DESTINATION': '2',
-      'SEND_DATE': _formattedDate
+      'SEND_DATE': '2021-08-09'
     };
-    return FutureBuilder(
+    //Constraints.getProgress(context);
+    Future.delayed(Duration(seconds :10));
+    return FutureBuilder (
       future:ServicesApi.getAllRequests(map) ,
       builder: (ctx,snapshot){
-       // Future.delayed(Duration(seconds: 1));
+        Future.delayed(Duration(seconds: 1));
       if( snapshot.connectionState==ConnectionState.done&& snapshot.hasData){
         _requestsList=snapshot.data;
         print('jjjjj ${fromDestSerial}');
-        return Container(
-           height:100 ,
-              child: GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200,
-                childAspectRatio: 1.5,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20
+        return  Container(
+          child: GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: width/2,
+                  childAspectRatio: 1.5,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20
+                ),
+                children: _requestsList.map((e) => buildRequestItemCard(e,context)).toList(),
               ),
-              children: _requestsList.map((e) => RequestItemCard(e)).toList(),),
-            );
+        );
         }else if(snapshot.connectionState==ConnectionState.waiting){
-        Constraints.getProgress(ctx);
+       // Constraints.getProgress(ctx);
        Navigator.pop(context);
       }else if(_requestsList.isEmpty){
         return Center(child: Text('no data'),);
@@ -296,4 +335,48 @@ class _SenderReceiverState extends State<SenderReceiver1> {
       },
     );
   }
+
+
+  ///////////// build request item card///////////////////////////////
+
+   Widget buildRequestItemCard( RequestModel requestModel,BuildContext context){
+  String  image='asset/images/wishlist_not_select.png';
+    return Card(
+      margin: EdgeInsets.all(10),
+      child: Container(
+        child:Stack(
+          children: [
+            Image.asset('asset/images/home_photo.png',fit: BoxFit.cover),
+            Positioned(
+                right: 5,
+                bottom: 10,
+                child: Text(requestModel.price.toString(),style: TextStyle(color: Colors.green),)),
+            Positioned(left: 0,
+                top: 0,
+                child: IconButton(icon:Image.asset(image),onPressed: (){
+                  setState(() {
+                if( image=='asset/images/wishlist_not_select.png'){
+                  print(image);
+                  image='asset/images/home.png.png';
+                  print(image);
+                  Toast.show('add to favorite', context,duration:Toast.LENGTH_LONG);
+                }else{
+                  image='asset/images/wishlist_select.png';
+                  print(image);
+                  Toast.show('remove from favorite', context,duration:Toast.LENGTH_LONG);
+                }
+                  });
+
+                },)
+            ),
+            Positioned(
+                left: 5,
+                bottom: 10,child: Text(requestModel.description,style: TextStyle(color: Colors.black),))
+          ],
+        ) ,
+      ),
+    );
+  }
+
+
 }
