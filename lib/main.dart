@@ -12,7 +12,7 @@ import 'models/dest_model.dart';
 
 void main() async{
 
-  runApp(SenderReceiver());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
