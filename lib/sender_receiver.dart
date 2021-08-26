@@ -18,7 +18,10 @@ class SenderReceiver extends StatelessWidget {
     final ThemeData theme = ThemeData();
     WidgetsFlutterBinding.ensureInitialized();
     return MaterialApp(
-      theme: ThemeData(primaryColor: Colors.grey.shade300,accentColor: Colors.white),
+   debugShowCheckedModeBanner: false,
+      theme: ThemeData(brightness: Brightness.light,accentColor: Colors.blue.shade300,
+          primaryColor: Colors.white,
+      canvasColor: Colors.white),
 
       home: ChangeNotifierProvider<MyProvide>(
           create :(_)=>MyProvide(),
@@ -38,7 +41,7 @@ class SenderReceiver1 extends StatefulWidget {
 class _SenderReceiverState extends State<SenderReceiver1> {
 
   var _style = TextStyle(fontSize: 20);
-  TextStyle _style1=TextStyle(fontSize: 18,color: Colors.white);
+  TextStyle _style1=TextStyle(fontSize: 18,color: Colors.white,);
   DateTime _date;
   String _formattedDate;
   List<DestModel> _destList=[];
@@ -61,14 +64,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
   @override
   void initState() {
     super.initState();
-   Provider.of<MyProvide>(context,listen: false).getFromToDest();
-
-   // print('${fromDestSerial.toString()} vvvvvvvvvvvv');
-   // if(Provider.of<MyProvide>(context,listen: true).dropValueFrom;
-
-
-    // Future.delayed(Duration(seconds: 10)).then((value) =>  Provider.of<MyProvide>(context,listen: false).getFromToDest());
-    // Future().then((value) =>  Provider.of<MyProvide>(context,listen: false).getFromToDest());
+    Provider.of<MyProvide>(context,listen: false).getFromToDest();
 
   }
 
@@ -85,32 +81,50 @@ class _SenderReceiverState extends State<SenderReceiver1> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          leading: Icon(Icons.home,color: Colors.blue.shade300,),
-          title: Text('All Requests'),
+          iconTheme: IconThemeData(color: Colors.blue.shade300),
+          actions: [
+            Container(
+                margin:EdgeInsets.all(5),child: IconButton(icon:Icon(Icons.home,color: Colors.blue.shade300,),onPressed: (){},)),
+          ],
+          //leading: Icon(Icons.home,color: Colors.blue.shade300,),
+          title: Text('All Requests',style: TextStyle(fontSize: 18,color: Colors.grey),),
           centerTitle: true,
-          elevation: 20,
-          bottom: TabBar(
-            indicatorColor: Colors.blue.shade300,
-            labelColor: Colors.blue.shade300,
-            unselectedLabelColor: Colors.grey,
-            labelStyle: _style,
-            tabs: [
-
-              Tab(text: 'sender',),
-              Tab(text: 'receiver',)
-            ],
-          ),
+          elevation: 10,
         ),
-        body: TabBarView(
+        body:
+        Column(
           children: [
-            buildSenderTab(),
-            Center(child: Text('data')),
+            Card(
+              elevation: 5,
+              child:TabBar(
+                  indicatorColor: Colors.blue.shade300,
+                  labelColor: Colors.blue.shade300,
+                  unselectedLabelColor: Colors.grey,
+                  labelStyle: _style,
+                  tabs: [
+
+                    Tab(text: 'sender',),
+                    Tab(text: 'receiver',)
+                  ],
+                ),
+            ),
+
+            Flexible(
+              flex: 1,
+              child: TabBarView(
+                children: [
+                  buildSenderTab(),
+                  Center(child: Text('data')),
+                ],
+              ),
+            ),
           ],
         ),
         drawer: Drawer(
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: Icon(Icons.add,color: Colors.white,),
+          elevation: 20,
           onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (_)=>CreateRequest())),
         ),
       ),
@@ -134,23 +148,21 @@ class _SenderReceiverState extends State<SenderReceiver1> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0,0,10,0),
-                    child: Text('FROM :'),
+                    padding: const EdgeInsets.fromLTRB(0,0,5,0),
+                    child: Text('FROM :',style: TextStyle(color: Colors.blue.shade300,fontSize: 15),),
                   ),
-                  SizedBox(width: 10,),
+                  SizedBox(width: 5,),
                   buildDropDownListFrom(),
-                  SizedBox(width: 10,),
+                  SizedBox(width: 5,),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0,0,10,0),
-                    child: Text('TO :'),
+                    padding: const EdgeInsets.fromLTRB(0,0,5,0),
+                    child: Text('TO :',style: TextStyle(color: Colors.blue.shade300,fontSize: 15),),
                   ),
                   buildDropDownListTo(),
                 ],
               ),
 
               SizedBox(height: 20,),
-              // Divider(color: Colors.yellow.shade700,thickness: 1,indent: 60,endIndent: 60,),
-              // SizedBox(height: 10,),
               buildDateRowWithText(),
               SizedBox(height: 10,),
               Divider(color: Colors.yellow.shade700,thickness: 1,indent: 60,endIndent: 60,),
@@ -169,20 +181,21 @@ class _SenderReceiverState extends State<SenderReceiver1> {
                     if(_formattedDate==null){
                       Toast.show('must enter date', context,duration: Toast.LENGTH_LONG);
                     }else{
+                      Map<String, String> map = {
+                        'USER_NAME': '1',
+                        'FROM_DESTINATION': fromDestSerial.toString(),
+                        'TO_DESTINATION':toDestSerial.toString(),
+                        'SEND_DATE': _formattedDate
+                      };
+                      Provider.of<MyProvide>(context, listen: false)
+                          .getAllRequests(map);
                       Provider.of<MyProvide>(context,listen: false).getFlag(1);
+
                       print('flag ${flag}');
                     }
 
-
                     print('fffffff   >>>> ${fromDestSerial}    ..... ${_requestsList.length}');
-                    Map<String, String> map = {
-                      'USER_NAME': '1',
-                      'FROM_DESTINATION': '1',
-                      'TO_DESTINATION':'2',
-                      'SEND_DATE': _formattedDate
-                    };
-                    Provider.of<MyProvide>(context, listen: false)
-                        .getAllRequests(map);
+
                   }
 
 
@@ -193,18 +206,9 @@ class _SenderReceiverState extends State<SenderReceiver1> {
             ],
           ),
         ),
-        Expanded (
-          flex:2,child: Provider.of<MyProvide>(context,listen: true).flag==0?
-        Center(child:Text('choose from , to dest and date to get all requests!!')):
-        GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: width/2,
-            childAspectRatio: 1.5,
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 20
-        ),
-          children: _requestsList.map((e) => buildRequestItemCard(e,context)).toList(),
-        ),
-        )
+        Expanded(flex: 2,child:
+        buildExpandedRequestsList()),
+
       ],
     );
   }
@@ -251,8 +255,6 @@ class _SenderReceiverState extends State<SenderReceiver1> {
 
   }
   void showDatePickerFn() {
-
-
     showDatePicker(context: context, initialDate: DateTime.now(),
         firstDate: DateTime(2015), lastDate: DateTime(2025)).
     then((value) =>setState(() {
@@ -267,12 +269,23 @@ class _SenderReceiverState extends State<SenderReceiver1> {
 
 //............................. build drop down from to dest  ...............................
   Widget buildDropDownListFrom() {
-TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
+    TextStyle _style=TextStyle(fontSize: 16,color: Colors.deepOrange);
     return _destList.length==0? CircularProgressIndicator():
     DropdownButton(
-      hint:Provider.of<MyProvide>(context,listen: true).dropValueFrom==null?Text('Dest',style: _style,):
-      Text(Provider.of<MyProvide>(context,listen: true).dropValueFrom,style: _style,),
-      icon: Icon(Icons.arrow_drop_down),
+      hint: Container(
+        width: 90,
+        height: 38,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8)
+        ),
+        child: Card(elevation:8,child: Center(child:
+        Provider.of<MyProvide>(context,listen: true).dropValueFrom==null?Text('Dest',style: _style,):
+        Text(Provider.of<MyProvide>(context,listen: true).dropValueFrom,style: _style,),
+        ))
+        ,),
+
+      icon: Icon(Icons.arrow_drop_down,color: Colors.blue.shade300,),
       iconSize: 24,
       elevation: 16,
       style: TextStyle(color: Colors.red, fontSize: 18),
@@ -289,24 +302,11 @@ TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
 
         print('zzzzzzzzz ${fromDestSerial}  mjhh  ${toDestSerial}');
         Provider.of<MyProvide>(context,listen: false).setValueDestFrom(val.name);
-        // if(fromDestSerial==toDestSerial){
-        //   Toast.show('msg', context,duration: Toast.LENGTH_SHORT);
-        // }else {
-        //   Map<String, String> map = {
-        //     'USER_NAME': '1',
-        //     'FROM_DESTINATION': fromDestSerial.toString(),
-        //     'TO_DESTINATION': toDestSerial.toString(),
-        //     'SEND_DATE': '2021-08-09'
-        //   };
-        //   Provider.of<MyProvide>(context, listen: false)
-        //       .getAllRequests(map);
-        // }
-
       },
       items: _destList.map<DropdownMenuItem<DestModel>>((DestModel value) {
         return DropdownMenuItem<DestModel>(
           value: value,
-          child: Text(value.name),
+          child: Text(value.name,style: TextStyle(),),
         );
       }).toList(),
     );
@@ -315,12 +315,22 @@ TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
 
 
   Widget buildDropDownListTo() {
-    TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
+    TextStyle _style=TextStyle(fontSize: 16,color: Colors.deepOrange);
     return _destList.length==0? CircularProgressIndicator():
     DropdownButton(
-      hint:Provider.of<MyProvide>(context,listen: true).dropValueTo==null?Text('Dest',style: _style,):
-      Text(Provider.of<MyProvide>(context,listen: true).dropValueTo,style: _style,),
-      icon: Icon(Icons.arrow_drop_down),
+      hint: Container(
+        width: 90,
+        height: 38,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8)
+        ),
+        child: Card(elevation:8,child: Center(child:
+        Provider.of<MyProvide>(context,listen: true).dropValueTo==null?Text('Dest',style: _style,):
+        Text(Provider.of<MyProvide>(context,listen: true).dropValueTo,style: _style,),
+        ))
+        ,),
+      icon: Icon(Icons.arrow_drop_down,color: Colors.blue.shade300,),
       iconSize: 24,
       elevation: 16,
       style: TextStyle(color: Colors.red, fontSize: 18),
@@ -334,7 +344,7 @@ TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
           fromToFlag=1;
         });
 
-
+        Provider.of<MyProvide>(context,listen: false).setValueDestTo(val.name);
       },
       items: _destList.map<DropdownMenuItem<DestModel>>((DestModel value) {
         return DropdownMenuItem<DestModel>(
@@ -388,7 +398,6 @@ TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
 
 
   ///////////// build request item card///////////////////////////////
-
   Widget buildRequestItemCard( RequestModel requestModel,BuildContext context){
     String  image='asset/images/wishlist_not_select.png';
     return Card(
@@ -403,21 +412,12 @@ TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
                 child: Text(requestModel.price.toString(),style: TextStyle(color: Colors.green),)),
             Positioned(left: 0,
                 top: 0,
-                child: IconButton(icon:Image.asset(image),onPressed: (){
-                  setState(() {
-                    if( image=='asset/images/wishlist_not_select.png'){
-                      print(image);
-                      image='asset/images/home.png.png';
-                      print(image);
-                      Toast.show('add to favorite', context,duration:Toast.LENGTH_LONG);
-                    }else{
-                      image='asset/images/wishlist_select.png';
-                      print(image);
-                      Toast.show('remove from favorite', context,duration:Toast.LENGTH_LONG);
-                    }
-                  });
-
-                },)
+                child: IconButton(icon:Image.asset(
+                    Provider.of<MyProvide>(context,listen: true).image==null?image:
+                    Provider.of<MyProvide>(context,listen: true).image
+                ),onPressed:()=>
+                    Provider.of<MyProvide>(context,listen: false).setWishListImage(image, context)
+                  ,)
             ),
             Positioned(
                 left: 5,
@@ -426,6 +426,25 @@ TextStyle _style=TextStyle(fontSize: 18,color: Colors.deepOrange);
         ) ,
       ),
     );
+  }
+
+  buildExpandedRequestsList() {
+    if( Provider.of<MyProvide>(context,listen: true).flag==0){
+      return Center(child:Text('choose from , to dest and date to get all requests!!'));
+    }else if(Provider.of<MyProvide>(context,listen: true).requests.isEmpty){
+      return Center(child:Text('Empty Requests'));
+    }else{
+      return  GridView(gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: MediaQuery.of(context).size.width/2,
+          childAspectRatio: 1.5,
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20
+      ),
+        children: _requestsList.map((e) => buildRequestItemCard(e,context)).toList(),
+      );
+    }
+
+
   }
 
 

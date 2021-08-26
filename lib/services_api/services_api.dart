@@ -28,12 +28,12 @@ class ServicesApi {
 
     print('sucess  ${json.encode(map)}');
     print(map.toString());
-  var responce=  await http.post(Uri.parse(url), body: json.encode(map),
+    var responce=  await http.post(Uri.parse(url), body: json.encode(map),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         encoding: Encoding.getByName('utf-8'));
-       print(responce.body);
+    print(responce.body);
     if (responce.statusCode == 200) {
       print('sucess  ${responce.body}');
       return responce.body;
@@ -43,16 +43,16 @@ class ServicesApi {
     }
   }
 
-  static Future createRequest(Map<String, String> map) async {
+  static Future createRequest(Map<String, dynamic> map) async {
     var url = 'http://sub-way.herokuapp.com/CREATEREQUEST_API';
 
     final http.Response response = await http.post(
-      Uri.parse(url),
+        Uri.parse(url),
         body: json.encode(map),
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        encoding: Encoding.getByName('utf-8')
+        // headers: {
+        //   "Content-Type": "application/x-www-form-urlencoded",
+        // },
+        // encoding: Encoding.getByName('utf-8')
     );
     if (response.statusCode == 200) {
       print('sucess ${response.body}');
@@ -62,7 +62,7 @@ class ServicesApi {
     }
   }
 
- static  Future<List<DestModel>> fetchDest() async {
+  static  Future<List<DestModel>> fetchDest() async {
     List<DestModel> _postList = new List<DestModel>();
 
     Map<String,String> map={
@@ -122,4 +122,3 @@ class ServicesApi {
   }
 
 }
-

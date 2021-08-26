@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:subway_app/models/dest_model.dart';
 import 'package:subway_app/models/request.dart';
+import 'package:toast/toast.dart';
 
 class MyProvide with ChangeNotifier{
   int flag=0;
@@ -11,16 +12,19 @@ class MyProvide with ChangeNotifier{
   List<DestModel> destList = [];
   String dropValueFrom;
   String dropValueTo;
+  String image;
 
 
   void getFlag(int f){
     if(f==1){
       flag=1;
       //dropValue=destList[0].name;
+    }else{
+      flag=0;
     }
+    print('flaggggg ${flag}');
     notifyListeners();
 
-    print('flag ${flag}');
   }
 
   void setValueDestFrom(String x){
@@ -105,6 +109,18 @@ class MyProvide with ChangeNotifier{
       print('ccccccccccccc');
       // If that call was not successful, throw an error.
       throw Exception('Failed to load post');
+    }
+  }
+
+
+  void setWishListImage(String im,BuildContext context){
+    if( im=='asset/images/wishlist_not_select.png'){
+      image='asset/images/refresh_code.png';
+      Toast.show('add to favorite', context,duration:Toast.LENGTH_LONG);
+      print(image);
+    }else{
+      image='asset/images/wishlist_select.png';
+      Toast.show('remove from favorite', context,duration:Toast.LENGTH_LONG);
     }
   }
 }

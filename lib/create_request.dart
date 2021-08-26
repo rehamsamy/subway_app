@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:subway_app/sender_receiver.dart';
 import 'package:toast/toast.dart';
 
 import 'constraints.dart';
 import 'models/dest_model.dart';
 import 'models/request.dart';
+import 'services_api/my_provider.dart';
 import 'services_api/services_api.dart';
 
 
@@ -13,7 +16,10 @@ class CreateRequest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: CreateRequest1(),
+      debugShowCheckedModeBanner: false,
+      home: ChangeNotifierProvider<MyProvide>(
+          create :(_)=>MyProvide(),
+          child: CreateRequest1()),
     );
   }
 }
@@ -31,11 +37,16 @@ class _CreateRequestState extends State<CreateRequest1> {
   DateTime _date;
   String _formattedDate;
   List<DestModel> _destList=[];
-  List<RequestModel> _requestsList=[];
   var _descController=TextEditingController();
   var _priceController=TextEditingController();
   bool _isLoaded=true;
   int flag=0;
+
+  GlobalKey<FormState> _priceKey=GlobalKey();
+  GlobalKey<FormState> _descKey=GlobalKey();
+
+  int fromToFlag=0;
+
 
 
   String dropdownValueFrom ;
@@ -44,122 +55,181 @@ class _CreateRequestState extends State<CreateRequest1> {
   int toDestSerial;
 
   @override
+  void initState() {
+    Provider.of<MyProvide>(context,listen: false).getFromToDest();
+  }
+  @override
   Widget build(BuildContext context) {
+    _destList=Provider.of<MyProvide>(context,listen: true).destList;
     return Scaffold(
-        body: buildCreateRequestWidgt(),
+      appBar:  AppBar(
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.blue.shade300),
+        // leading: Icon(Icons.home,color: Colors.blue.shade300,),
+        actions: [
+          Container(margin:EdgeInsets.symmetric(horizontal: 10),child: Icon(Icons.home,color: Colors.blue.shade300,)),
+        ],
+        title: Text('Create Request',style:TextStyle(fontSize: 18,color: Colors.grey)),
+        centerTitle: true,
+        elevation: 12,
+      ),
+      body: buildCreateRequestWidgt(),
+      drawer: Drawer(
 
-
+      ),
     );
+
   }
 
 
- Widget buildCreateRequestWidgt(){
-  return  Container(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+  Widget buildCreateRequestWidgt(){
+    return  Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.white,
+      child: Container(
+        margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
+        child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0,0,10,0),
-              child: Text('FROM :'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0,0,10,0),
+                  child: Text('FROM :'),
+                ),
+                SizedBox(width: 10,),
+                buildDropDownListFrom(),
+                SizedBox(width: 10,),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0,0,10,0),
+                  child: Text('TO :'),
+                ),
+                buildDropDownListTo(),
+              ],
             ),
-            SizedBox(width: 10,),
-            buildDropDownListFromTo(dropdownValueFrom),
-            SizedBox(width: 10,),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0,0,10,0),
-              child: Text('TO :'),
+
+            SizedBox(height: 10,),
+            getPriceWidget(),
+            SizedBox(height: 20,),
+            bulidDescriptionWidget(),
+            SizedBox(height: 30,),
+
+            buildDateRowWithText(),
+            SizedBox(height: 10,),
+            Divider(color: Colors.yellow.shade800,thickness: 1,indent: 60,endIndent: 60,),
+            SizedBox(height: 10,),
+            Container(
+              width: double.infinity,
+              margin: EdgeInsets.fromLTRB(40, 60, 40, 0),
+              height: 42,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.blue.shade300
+              ),
+              child: FlatButton(child: Text('Create Request',style: _style1,),onPressed:()async{
+                print('pressed');
+                if(_formattedDate==null){
+                  Toast.show('must enter date', context,duration: Toast.LENGTH_LONG);
+                }else{
+                  createRequestApi();
+                }
+              }
+
+              ),
             ),
-            buildDropDownListFromTo(dropdownValueTo),
           ],
         ),
+      ),
+    );
+  }
 
-        SizedBox(height: 10,),
-        getPriceWidget(),
-        SizedBox(height: 20,),
-        bulidDescriptionWidget(),
-        SizedBox(height: 20,),
-
-        // Divider(color: Colors.yellow.shade700,thickness: 1,indent: 60,endIndent: 60,),
-        // SizedBox(height: 10,),
-        buildDateRowWithText(),
-        SizedBox(height: 10,),
-        Divider(color: Colors.yellow.shade700,thickness: 1,indent: 60,endIndent: 60,),
-        SizedBox(height: 10,),
-        Container(
-          width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 40),
-          height: 42,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.blue.shade300
-          ),
-          child: Center(
-            child: FlatButton(child: Text('Create Request',style: _style1,),onPressed:()async{
-              print('pressed');
-              if(_formattedDate==null){
-                Toast.show('must enter date', context,duration: Toast.LENGTH_LONG);
-              }else{
-                createRequestApi();
-              }
-            }
-
-            ),
-          ),
+  Widget buildDropDownListFrom() {
+    TextStyle _style=TextStyle(fontSize: 16,color: Colors.deepOrange);
+    return _destList.length==0? CircularProgressIndicator():
+    DropdownButton(
+      hint: Container(
+        width: 90,
+        height: 38,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8)
         ),
-      ],
-    ),
-  );
+        child: Card(elevation:8,child: Center(child:
+        Provider.of<MyProvide>(context,listen: true).dropValueFrom==null?Text('Dest',style: _style,):
+        Text(Provider.of<MyProvide>(context,listen: true).dropValueFrom,style: _style,),
+        ))
+        ,),
+
+      icon: Icon(Icons.arrow_drop_down,color: Colors.blue.shade300,),
+      iconSize: 24,
+      elevation: 16,
+      style: TextStyle(color: Colors.red, fontSize: 18),
+      underline: Container(
+        height: 2,
+      ),
+      onChanged: (val){
+        print(val.name);
+        setState(() {
+          fromToFlag=1;
+          fromDestSerial=val.dest_serial;
+        });
+
+
+        print('zzzzzzzzz ${fromDestSerial}  mjhh  ${toDestSerial}');
+        Provider.of<MyProvide>(context,listen: false).setValueDestFrom(val.name);
+      },
+      items: _destList.map<DropdownMenuItem<DestModel>>((DestModel value) {
+        return DropdownMenuItem<DestModel>(
+          value: value,
+          child: Text(value.name,style: TextStyle(),),
+        );
+      }).toList(),
+    );
+
   }
 
 
-  Widget buildDropDownListFromTo(String dropValue){
-    return FutureBuilder(
-        future: ServicesApi.fetchDest(),
-        builder: (ctx, snapshot){
-          print('x1');
-          // _destList=ServicesApi.fetchDest();
-          if (snapshot.connectionState == ConnectionState.done) {
-            print('x2');
-            _destList=snapshot.data;
-            return
-              DropdownButton(
-                value: snapshot.hasData?_destList[0]:null,
-                icon: Icon(Icons.arrow_drop_down),
-                iconSize: 24,
-                elevation: 16,
-                style: TextStyle(color: Colors.red, fontSize: 18),
-                underline: Container(
-                  height: 2,
-                  // color: Colors.deepPurpleAccent,
-                ),
-                onChanged: (val){
-                  setState(() {
-                    dropValue=val.name;
-                    //print(val);
-                    DestModel model=_destList.firstWhere((element) => val.name==element.name);
-                    fromDestSerial=model.dest_serial;
-                    toDestSerial=model.dest_serial;
-                    // print('drop 1 : ${model}');
-                  });
-                },
-                items: snapshot.data.map<DropdownMenuItem<DestModel>>((DestModel value) {
-                  return DropdownMenuItem<DestModel>(
-                    value: value,
-                    child: Text(value.name),
-                  );
-                }).toList(),
-              );
-          }
-          else {
-            print('x3');
-            //Toast.show('error', context,duration: Toast.LENGTH_LONG);
-            return Center(child: CircularProgressIndicator());
-          }
-        }
+  Widget buildDropDownListTo() {
+    TextStyle _style=TextStyle(fontSize: 16,color: Colors.deepOrange);
+    return _destList.length==0? CircularProgressIndicator():
+    DropdownButton(
+      hint: Container(
+        width: 90,
+        height: 38,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8)
+        ),
+        child: Card(elevation:8,child: Center(child:
+        Provider.of<MyProvide>(context,listen: true).dropValueTo==null?Text('Dest',style: _style,):
+        Text(Provider.of<MyProvide>(context,listen: true).dropValueTo,style: _style,),
+        ))
+        ,),
+      icon: Icon(Icons.arrow_drop_down,color: Colors.blue.shade300,),
+      iconSize: 24,
+      elevation: 16,
+      style: TextStyle(color: Colors.red, fontSize: 18),
+      underline: Container(
+        height: 2,
+      ),
+      onChanged: (val){
+        print(val.name);
+        setState(() {
+          toDestSerial=val.dest_serial;
+          fromToFlag=1;
+        });
+
+        Provider.of<MyProvide>(context,listen: false).setValueDestTo(val.name);
+      },
+      items: _destList.map<DropdownMenuItem<DestModel>>((DestModel value) {
+        return DropdownMenuItem<DestModel>(
+          value: value,
+          child: Text(value.name),
+        );
+      }).toList(),
     );
+
   }
 
   Widget buildDateRowWithText(){
@@ -218,17 +288,18 @@ class _CreateRequestState extends State<CreateRequest1> {
   }
 
   Widget getPriceWidget(){
-   return Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(('PRICE :'), style: Constraints.blueStyle,),
         Form(
+          key: _priceKey,
           child:
           Container(
             width: 200,
             child: TextFormField(
               keyboardType: TextInputType.number,
-              //controller: _emailController,
+              controller: _priceController,
               textAlign: TextAlign.start,
               validator: (val) {
                 if (val.isEmpty) {
@@ -248,22 +319,38 @@ class _CreateRequestState extends State<CreateRequest1> {
   }
 
   void createRequestApi() async{
-    Map<String,String> map={'USER_NAME':'1',
-      'FROM_DESTINATION':'1',
-      'TO_DESTINATION':'2' ,
-      'DESCRIPTION':'bbbbbbb',
-      'SEND_DATE':_formattedDate};
-Constraints.getProgress(context);
-    var res=await ServicesApi.createRequest(map);
-    print(res);
+    double _price;
+    try {
+      _price = double.parse(_priceController.text);
+    }catch(e){
+      Toast.show('Please enter valid price', context,duration: Toast.LENGTH_LONG);
+    }
+    if(!_descKey.currentState.validate()&&!_priceKey.currentState.validate())
+      return;
+    if(fromDestSerial==toDestSerial){
+      Toast.show('Please Choose another  To Dest ', context,duration: Toast.LENGTH_LONG);
+    }else {
+      Map<String, dynamic> map = {'USER_NAME': '1',
+        'FROM_DESTINATION': fromDestSerial.toString(),
+        'TO_DESTINATION': toDestSerial.toString(),
+        'DESCRIPTION': _descController.text,
+        'PRICE': _priceController.text,
+        'SEND_DATE': _formattedDate};
+      // Constraints.getProgress(context);
+      // Navigator.pop(context);
+      print(map.toString());
+      var res = await ServicesApi.createRequest(map);
+      print(res);
 
-    if(res=='Request Created'){
-      Toast.show(res, context,duration: Toast.LENGTH_LONG);
-    }else{
-      Toast.show(res, context,duration: Toast.LENGTH_LONG);
+      if (res == 'Request Created') {
+        Toast.show(res, context, duration: Toast.LENGTH_LONG);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => SenderReceiver()));
+      } else {
+        Toast.show(res, context, duration: Toast.LENGTH_LONG);
+      }
     }
 
-    Navigator.pop(context);
   }
 
 
@@ -275,6 +362,7 @@ Constraints.getProgress(context);
       children: [
         Text(('Description :'), style: Constraints.blueStyle,),
         Form(
+          key: _descKey,
           child:
           Container(
             width: 300,
@@ -289,8 +377,8 @@ Constraints.getProgress(context);
               },
               onSaved: (val) {},
               decoration: InputDecoration(
-                suffixIcon:
-                Image.asset('asset/images/pricec.png'),
+                suffixIcon:Icon(Icons.comment,color: Colors.yellow.shade800,),
+                // Image.asset('asset/images/pricec.png'),
                 contentPadding: EdgeInsets.fromLTRB(8, 0, 0, 0),
                 labelText: 'Enter Description',
               ),
