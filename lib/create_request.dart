@@ -330,7 +330,7 @@ class _CreateRequestState extends State<CreateRequest1> {
     if(fromDestSerial==toDestSerial){
       Toast.show('Please Choose another  To Dest ', context,duration: Toast.LENGTH_LONG);
     }else {
-      Map<String, dynamic> map = {'USER_NAME': '1',
+      Map<String, String> map = {'USER_NAME': '1',
         'FROM_DESTINATION': fromDestSerial.toString(),
         'TO_DESTINATION': toDestSerial.toString(),
         'DESCRIPTION': _descController.text,

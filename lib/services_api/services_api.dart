@@ -28,11 +28,9 @@ class ServicesApi {
 
     print('sucess  ${json.encode(map)}');
     print(map.toString());
-    var responce=  await http.post(Uri.parse(url), body: json.encode(map),
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        encoding: Encoding.getByName('utf-8'));
+    var responce=  await http.post(Uri.parse(url),
+    headers: map);
+
     print(responce.body);
     if (responce.statusCode == 200) {
       print('sucess  ${responce.body}');
@@ -43,16 +41,16 @@ class ServicesApi {
     }
   }
 
-  static Future createRequest(Map<String, dynamic> map) async {
+  static Future createRequest(Map<String, String> map) async {
     var url = 'http://sub-way.herokuapp.com/CREATEREQUEST_API';
 
     final http.Response response = await http.post(
         Uri.parse(url),
-        body: json.encode(map),
+       headers:map
         // headers: {
         //   "Content-Type": "application/x-www-form-urlencoded",
         // },
-        // encoding: Encoding.getByName('utf-8')
+        //  encoding: Encoding.getByName('utf-8')
     );
     if (response.statusCode == 200) {
       print('sucess ${response.body}');
