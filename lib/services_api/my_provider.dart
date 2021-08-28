@@ -13,7 +13,14 @@ class MyProvide with ChangeNotifier{
   String dropValueFrom;
   String dropValueTo;
   String image;
+  String userSerialNum;
 
+void setUserSerial(String x){
+  userSerialNum=x;
+  print(x);
+  print(userSerialNum);
+  notifyListeners();
+}
 
   void getFlag(int f){
     if(f==1){

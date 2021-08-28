@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:subway_app/login.dart';
 import 'package:subway_app/sender_receiver.dart';
 import 'package:toast/toast.dart';
 
@@ -149,7 +150,7 @@ class _CreateRequestState extends State<CreateRequest1> {
     return _destList.length==0? CircularProgressIndicator():
     DropdownButton(
       hint: Container(
-        width: 90,
+        width: 80,
         height: 38,
         decoration: BoxDecoration(
             color: Colors.white,
@@ -195,7 +196,7 @@ class _CreateRequestState extends State<CreateRequest1> {
     return _destList.length==0? CircularProgressIndicator():
     DropdownButton(
       hint: Container(
-        width: 90,
+        width: 80,
         height: 38,
         decoration: BoxDecoration(
             color: Colors.white,
@@ -330,12 +331,15 @@ class _CreateRequestState extends State<CreateRequest1> {
     if(fromDestSerial==toDestSerial){
       Toast.show('Please Choose another  To Dest ', context,duration: Toast.LENGTH_LONG);
     }else {
-      Map<String, String> map = {'USER_NAME': '1',
+      Map<String, String> map = {'USER_NAME':  Login.x,
         'FROM_DESTINATION': fromDestSerial.toString(),
         'TO_DESTINATION': toDestSerial.toString(),
         'DESCRIPTION': _descController.text,
         'PRICE': _priceController.text,
         'SEND_DATE': _formattedDate};
+
+      print('fffffff   >>>> ${fromDestSerial}    .....  ..... ${ Login.x}');
+
       // Constraints.getProgress(context);
       // Navigator.pop(context);
       print(map.toString());
@@ -365,7 +369,7 @@ class _CreateRequestState extends State<CreateRequest1> {
           key: _descKey,
           child:
           Container(
-            width: 300,
+            width: 200,
             child: TextFormField(
               keyboardType: TextInputType.text,
               controller: _descController,

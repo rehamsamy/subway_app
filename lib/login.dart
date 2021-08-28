@@ -1,24 +1,41 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subway_app/constraints.dart';
 import 'package:subway_app/forget_password.dart';
 import 'package:subway_app/home.dart';
+import 'package:subway_app/services_api/my_provider.dart';
 import 'package:subway_app/services_api/services_api.dart';
 import 'package:toast/toast.dart';
 
 import 'register.dart';
 
-class Login extends StatefulWidget {
+
+class Login extends StatelessWidget {
+
+  static String x;
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(create :(_)=>MyProvide(),child:Login1() ,);
+  }
+
+
+
+
+}
+
+
+class Login1 extends StatefulWidget {
+  static String user_serial;
 
   @override
   _LoginState createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<Login1> {
 
   GlobalKey<FormState> _key=GlobalKey();
-
   TextStyle _style1=TextStyle(fontSize: 18,color: Colors.white);
   var _emailController=TextEditingController();
   var _passwordController=TextEditingController();
@@ -27,7 +44,10 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
    // setDataInPreferences();
 
-    return Scaffold(
+    return
+    //   ChangeNotifierProvider(  create :(_)=>MyProvide(),
+    // child:
+      Scaffold(
       body: Center(
           child: Container(
               padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -110,6 +130,7 @@ class _LoginState extends State<Login> {
                     ]),
                   )))
       ),
+
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -129,20 +150,29 @@ class _LoginState extends State<Login> {
    Constraints.getProgress(context);
     var x=await ServicesApi.loginApi(map);
     print('fffffff ${x.toString()}');
+  //  print ('provideee  ${Provider.of<MyProvide>(context,listen: true).userSerialNum}');
   if(x=='Please Check user name and password'){
      Toast.show(x, context,duration: Toast.LENGTH_LONG);
      Future.delayed(Duration(seconds: 30));
      Navigator.pop(context);
 
+
   }else{
      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>MyHome()));
+    // Provider.of<MyProvide>(context,listen: true).setUserSerial(x);
      await setDataInPreferences(c_email.text,c_password.text);
+     Login.x=x;
+     print(Login.x);
   }
 
   }
+
+
 
 
 }
+
+
 
 setDataInPreferences(String email,password)async{
   SharedPreferences _prefs=await SharedPreferences.getInstance();

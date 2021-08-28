@@ -1,9 +1,12 @@
+import 'dart:html';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subway_app/constraints.dart';
 import 'package:intl/intl.dart';
 import 'package:subway_app/create_request.dart';
+import 'package:subway_app/login.dart';
 import 'package:subway_app/models/dest_model.dart';
 import 'package:subway_app/request_item_card.dart';
 import 'package:subway_app/services_api/my_provider.dart';
@@ -15,6 +18,7 @@ class SenderReceiver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final ThemeData theme = ThemeData();
     WidgetsFlutterBinding.ensureInitialized();
     return MaterialApp(
@@ -182,7 +186,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
                       Toast.show('must enter date', context,duration: Toast.LENGTH_LONG);
                     }else{
                       Map<String, String> map = {
-                        'USER_NAME': '1',
+                        'USER_NAME': Login.x,
                         'FROM_DESTINATION': fromDestSerial.toString(),
                         'TO_DESTINATION':toDestSerial.toString(),
                         'SEND_DATE': _formattedDate
@@ -194,7 +198,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
                       print('flag ${flag}');
                     }
 
-                    print('fffffff   >>>> ${fromDestSerial}    ..... ${_requestsList.length}');
+                    print('fffffff   >>>> ${fromDestSerial}    ..... ${_requestsList.length}  ..... ${ Login.x}');
 
                   }
 
@@ -262,7 +266,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
       final DateFormat formatter = DateFormat('yyyy-MM-dd');
       _formattedDate = formatter.format(_date);
 
-
+      print ('provideee  ${Provider.of<MyProvide>(context,listen: false).userSerialNum}');
       print('ggggggggg  ${_formattedDate}');
     }));
   }
@@ -273,7 +277,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
     return _destList.length==0? CircularProgressIndicator():
     DropdownButton(
       hint: Container(
-        width: 90,
+        width: 80,
         height: 38,
         decoration: BoxDecoration(
             color: Colors.white,
@@ -319,7 +323,7 @@ class _SenderReceiverState extends State<SenderReceiver1> {
     return _destList.length==0? CircularProgressIndicator():
     DropdownButton(
       hint: Container(
-        width: 90,
+        width: 80,
         height: 38,
         decoration: BoxDecoration(
             color: Colors.white,
